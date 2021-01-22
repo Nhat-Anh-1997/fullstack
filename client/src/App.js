@@ -1,31 +1,50 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import Posts from './components/Posts/Posts';
 import Form from './components/Form/Form';
-import * as api from './api/index';
+import * as actionCreators from './store/actions/index';
+import { connect } from 'react-redux';
+import axios from 'axios';
+import Spinner from './components/UI/Spinner/Spinner';
+import Auth from './components/Auth/Auth';
 
-const App = () => {
-  const [listPost, setListPost] = useState([]);
-
+const App = (props) => {
   useEffect(() => {
-    async function fetchPost() {
-      const res = await api.fetchPost();
-      const data = await res.data;
-      setListPost(data);
-    }
-    fetchPost();
+    props.onInitPost();
   }, []);
-  console.log(listPost);
 
+  const posts = props.posts.map((list) => {
+    return (
+      <div key={list._id}>
+        <p>{list.title}</p>
+      </div>
+    );
+  });
 
-  return (
+  let app = (
     <div>
-      <h1>APP</h1>
-      {listPost.map((list, index) => {
-        return <div key={index}>{list.title}</div>;
-      })}
+      <Auth />
+
       <Posts />
+      {posts}
       <Form />
     </div>
   );
+  if (props.loading) {
+    app = <Spinner />;
+  }
+
+  return <div>{app}</div>;
 };
-export default App;
+const mapStateToProps = (state) => {
+  return {
+    posts: state.post.posts,
+    loading: state.post.loading,
+  };
+};
+const mapDispatchToProps = (dispatch) => {
+  return {
+    onInitPost: () => dispatch(actionCreators.initPost()),
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(App, axios);

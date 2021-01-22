@@ -1,11 +1,11 @@
 import express from 'express';
-import { createPost, getPosts ,deletePost,getById} from '../controller/posts.js';
+import { createPost, getPosts, deletePost } from '../controller/posts.js';
+import auth from '../middleware/auth.js';
 
 const router = express.Router();
 
 router.get('/', getPosts);
-router.post('/', createPost);
-router.delete('/:id', deletePost)
-router.get('/:id',getById)
+router.post('/', auth, createPost);
+router.delete('/:id', auth, deletePost);
 
 export default router;
