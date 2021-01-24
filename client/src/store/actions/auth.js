@@ -21,7 +21,33 @@ const failAuth = (error) => {
   };
 };
 
-export const auth = (email, password, isSignUp) => {
+export const signup = (email, password, confirmPassword) => {
+  return (dispatch) => {
+    dispatch(startAuth());
+
+    const authData = {
+      email: email,
+      password: password,
+      confirmPassword: confirmPassword,
+    };
+
+    const url = 'http://localhost:5000/user/signup';
+
+    axios
+      .post(url, authData)
+      .then((res) => {
+        console.log(res);
+        console.log(res.data.token);
+        localStorage.setItem('token', res.data.token);
+        dispatch(successAuth(res.data.token));
+      })
+      .catch((error) => {
+        dispatch(failAuth(error));
+      });
+  };
+};
+
+export const login = (email, password) => {
   return (dispatch) => {
     dispatch(startAuth());
 
@@ -30,10 +56,7 @@ export const auth = (email, password, isSignUp) => {
       password: password,
     };
 
-    let url = 'http://localhost:5000/user/signup';
-    if (!isSignUp) {
-      url = 'http://localhost:5000/user/login';
-    }
+    const url = 'http://localhost:5000/user/login';
 
     axios
       .post(url, authData)
@@ -45,5 +68,12 @@ export const auth = (email, password, isSignUp) => {
       .catch((error) => {
         dispatch(failAuth(error));
       });
+  };
+};
+
+export const logout = () => {
+  localStorage.removeItem('token');
+  return {
+    type: actionTypes.LOGOUT,
   };
 };

@@ -22,6 +22,10 @@ const failAuth = (state, action) => {
   return updateObject(state, { error: action.error, loading: false });
 };
 
+const logout = (state, action) =>{
+  return updateObject(state,{token:null})
+}
+
 const reducer = (state = initialState, action) => {
   switch (action.type) {
     case actionTypes.START_AUTH:
@@ -30,6 +34,8 @@ const reducer = (state = initialState, action) => {
       return successAuth(state, action);
     case actionTypes.FAIL_AUTH:
       return failAuth(state, action);
+    case actionTypes.LOGOUT:
+      return logout(state,action);
 
     default:
       return state;

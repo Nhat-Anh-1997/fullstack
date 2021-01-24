@@ -5,17 +5,20 @@ const Auth = (props) => {
   const [auth, setAuth] = useState({
     email: '',
     password: '',
+    confirmPassword: '',
   });
 
-  const [isSignUp, setIsSignUp] = useState(true);
-  const switchAuthModeHandler = () => {
-    setIsSignUp((pre) => !pre);
+  const submitSignUp = (event) => {
+    event.preventDefault();
+    props.onSignup(auth.email, auth.password, auth.confirmPassword);
   };
 
-  const submitHandler = (event) => {
+  const submitLogIn = (event) => {
     event.preventDefault();
-    props.onAuth(auth.email, auth.password, isSignUp);
+    props.onLogin(auth.email, auth.password);
   };
+
+  const logout = () => props.onLogout();
 
   let form = (
     <div>
@@ -24,31 +27,50 @@ const Auth = (props) => {
           type='email'
           placeholder='Enter Your Email'
           onChange={(e) =>
-            setAuth({ email: e.target.value, password: auth.password })
+            setAuth({
+              email: e.target.value,
+              password: auth.password,
+              confirmPassword: auth.confirmPassword,
+            })
           }
         />
         <input
           type='password'
           placeholder='Enter Your Password'
           onChange={(e) =>
-            setAuth({ email: auth.email, password: e.target.value })
+            setAuth({
+              email: auth.email,
+              password: e.target.value,
+              confirmPassword: auth.confirmPassword,
+            })
+          }
+        />
+        <input
+          type='password'
+          placeholder='Enter Your ConFirmPassword'
+          onChange={(e) =>
+            setAuth({
+              email: auth.email,
+              password: e.target.value,
+              confirmPassword: e.target.value,
+            })
           }
         />
       </form>
-      <button onClick={submitHandler}>SUBMIT</button>
-      <button onClick={switchAuthModeHandler}>
-        {isSignUp ? 'SignUp' : 'LOGIN'}
-      </button>
+      <button onClick={submitSignUp}>SUBMIT SIGNUP</button>
+      <button onClick={submitLogIn}>SUBMIT LOGIN</button>
+      <button onClick={logout}>LOGOUT</button>
     </div>
   );
   let errorMessage = null;
   if (props.error) {
-    errorMessage = <p> already exist </p>;
+    errorMessage = <p> {props.error.message} </p>;
   }
 
   return (
     <div>
       {form}
+
       {errorMessage}
     </div>
   );
@@ -63,8 +85,11 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    onAuth: (email, password, isSignUp) =>
-      dispatch(actionCreators.auth(email, password, isSignUp)),
+    onSignup: (email, password, confirmPassword) =>
+      dispatch(actionCreators.signup(email, password, confirmPassword)),
+    onLogin: (email, password) =>
+      dispatch(actionCreators.login(email, password)),
+    onLogout: () => dispatch(actionCreators.logout()),
   };
 };
 export default connect(mapStateToProps, mapDispatchToProps)(Auth);
